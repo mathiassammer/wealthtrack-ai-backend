@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  # Nosso banco de dados local (Staging/Dev)
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: wealthtrack_postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin_password_local # Como é só local, não há risco. Em produção, é necessário usar o .env
+      POSTGRES_DB: wealthtrack_db
+    ports:
+      - "5432:5432" # Expõe a porta 5432 do container para a porta 5432 da sua máquina
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Garante que os dados não sumam se o container for parado, reiniciado ou removido
+
+volumes:
+  postgres_data:

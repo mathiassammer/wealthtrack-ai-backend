@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.1.1'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'checkstyle' // Analisa más práticas de código
+	id 'com.diffplug.spotless' version '6.25.0' // Formata o código automaticamente
 }
 
 group = 'com.wealthtrack'
@@ -30,6 +32,21 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+spotless {
+	java {
+		googleJavaFormat() // Adota o rigoroso padrão de formatação de código do Google
+		removeUnusedImports() // Remove imports que não estão sendo usados
+	}
+}
+
+tasks.register('preCommit') {
+	group = 'verification'
+	description = 'Formata o código e roda todos os testes e verificações antes de um commit'
+
+	// Ordem de execução: 1. Formata, 2. Roda Linting (Checkstyle) e Testes
+	dependsOn 'spotlessApply', 'check'
 }
 
 tasks.named('test') {
