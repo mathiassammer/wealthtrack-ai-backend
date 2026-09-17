@@ -44,3 +44,6 @@ out/
 ### Arquivos de Sistema Operacional ###
 .DS_Store
 Thumbs.db
+
+### Arquivo Firebase Cloud Storage
+firebase-key.json

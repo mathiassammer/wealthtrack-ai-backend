@@ -25,6 +25,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'com.auth0:java-jwt:4.4.0'
+	// Flyway Core e o suporte específico para PostgreSQL
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
+	// Firebase Admin SDK para Storage e Push Notifications
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+	// Biblioteca ultraleve para compressão e redimensionamento de imagens
+	implementation 'net.coobird:thumbnailator:0.4.20'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
