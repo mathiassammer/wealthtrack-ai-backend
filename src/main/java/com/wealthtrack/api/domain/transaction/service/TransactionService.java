@@ -6,6 +6,7 @@ import com.wealthtrack.api.domain.transaction.dto.TransactionRequestDTO;
 import com.wealthtrack.api.domain.transaction.model.Transaction;
 import com.wealthtrack.api.domain.transaction.model.TransactionType;
 import com.wealthtrack.api.domain.transaction.repository.TransactionRepository;
+import com.wealthtrack.api.infra.messaging.AuditProducer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +18,12 @@ public class TransactionService {
     // Injeção de dependências via construtor (Melhor prática do SOLID ao invés de usar @Autowired)
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
+    private final AuditProducer auditProducer;
 
-    public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository) {
+    public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository, AuditProducer auditProducer) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
+        this.auditProducer = auditProducer;
     }
 
     // A MÁGICA: @Transactional garante que, se o sistema der erro na linha 35,
@@ -46,6 +49,14 @@ public class TransactionService {
 
         // 4. Salva as alterações no banco de dados
         accountRepository.save(account);
-        return transactionRepository.save(transaction);
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        // A MÁGICA DA MENSAGERIA: O sistema bancário foi atualizado.
+        // Agora, nós "jogamos a carta" no Kafka de forma assíncrona.
+        // O sistema de IA (ou qualquer outro) lerá isso no futuro para aprender seu perfil de gastos.
+        auditProducer.sendAuditLog(savedTransaction);
+
+        return savedTransaction;
     }
 }

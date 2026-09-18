@@ -32,6 +32,10 @@ dependencies {
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
 	// Biblioteca ultraleve para compressão e redimensionamento de imagens
 	implementation 'net.coobird:thumbnailator:0.4.20'
+	// RabbitMQ
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	// Kafka
+	implementation 'org.springframework.kafka:spring-kafka'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
