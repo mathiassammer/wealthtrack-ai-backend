@@ -8,6 +8,7 @@ import com.wealthtrack.api.domain.transaction.model.TransactionType;
 import com.wealthtrack.api.domain.transaction.repository.TransactionRepository;
 import com.wealthtrack.api.infra.messaging.AuditProducer;
 import com.wealthtrack.api.infra.realtime.RealtimeNotificationService;
+import com.wealthtrack.api.infra.webhook.WebhookNotificationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,17 +22,20 @@ public class TransactionService {
     private final AccountRepository accountRepository;
     private final AuditProducer auditProducer;
     private final RealtimeNotificationService realtimeNotificationService;
+    private final WebhookNotificationService webhookNotificationService;
 
     public TransactionService(
             TransactionRepository transactionRepository,
             AccountRepository accountRepository,
             AuditProducer auditProducer,
-            RealtimeNotificationService realtimeNotificationService
+            RealtimeNotificationService realtimeNotificationService,
+            WebhookNotificationService webhookNotificationService
     ) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.auditProducer = auditProducer;
         this.realtimeNotificationService = realtimeNotificationService;
+        this.webhookNotificationService = webhookNotificationService;
     }
 
     // A MÁGICA: @Transactional garante que, se o sistema der erro na linha 35,
@@ -51,6 +55,17 @@ public class TransactionService {
         // 3. Regra de Negócio: Atualiza o saldo da conta
         if (dto.type() == TransactionType.EXPENSE) {
             account.subtractBalance(dto.amount()); // Chama o método da própria Conta (Encapsulamento)
+
+            BigDecimal userThreshold = account.getUser().getAlertThreshold();
+
+            // REGRA: Alerta para despesas acima de R$ 1.000,00
+            if (dto.amount().compareTo(userThreshold) > 0) {
+                webhookNotificationService.sendHighValueExpenseAlert(
+                        account.getUser().getEmail(),
+                        dto.category(),
+                        dto.amount().toString()
+                );
+            }
         } else if (dto.type() == TransactionType.INCOME) {
             account.addBalance(dto.amount());
         }

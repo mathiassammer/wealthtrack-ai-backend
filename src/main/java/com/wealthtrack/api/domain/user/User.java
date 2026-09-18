@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -25,12 +26,16 @@ public class User implements UserDetails { // O contrato com o Spring Security
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String email;
+    @Column(name = "password_hash")
     private String passwordHash;
+    @Column(name = "alert_threshold")
+    private BigDecimal alertThreshold;
 
     // Construtor para o momento do Cadastro
-    public User(String email, String passwordHash) {
+    public User(String email, String passwordHash, BigDecimal alertThreshold) {
         this.email = email;
         this.passwordHash = passwordHash;
+        this.alertThreshold = (alertThreshold != null) ? alertThreshold : new BigDecimal("1000.00");
     }
 
     // --- Métodos obrigatórios do contrato UserDatails ---
