@@ -36,6 +36,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	// Kafka
 	implementation 'org.springframework.kafka:spring-kafka'
+	// Ably para WebSockets e Tempo Real
+	implementation 'io.ably:ably-java:1.2.33'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'

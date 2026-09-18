@@ -7,6 +7,7 @@ import com.wealthtrack.api.domain.transaction.model.Transaction;
 import com.wealthtrack.api.domain.transaction.model.TransactionType;
 import com.wealthtrack.api.domain.transaction.repository.TransactionRepository;
 import com.wealthtrack.api.infra.messaging.AuditProducer;
+import com.wealthtrack.api.infra.realtime.RealtimeNotificationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,11 +20,18 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final AuditProducer auditProducer;
+    private final RealtimeNotificationService realtimeNotificationService;
 
-    public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository, AuditProducer auditProducer) {
+    public TransactionService(
+            TransactionRepository transactionRepository,
+            AccountRepository accountRepository,
+            AuditProducer auditProducer,
+            RealtimeNotificationService realtimeNotificationService
+    ) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.auditProducer = auditProducer;
+        this.realtimeNotificationService = realtimeNotificationService;
     }
 
     // A MÁGICA: @Transactional garante que, se o sistema der erro na linha 35,
@@ -56,6 +64,12 @@ public class TransactionService {
         // Agora, nós "jogamos a carta" no Kafka de forma assíncrona.
         // O sistema de IA (ou qualquer outro) lerá isso no futuro para aprender seu perfil de gastos.
         auditProducer.sendAuditLog(savedTransaction);
+
+        // NOVIDADE: Dispara para o Ably (Front-end pisca e atualiza na mesma hora!)
+        realtimeNotificationService.notifyBalanceUpdate(
+                account.getId().toString(),
+                account.getBalance().toString()
+        );
 
         return savedTransaction;
     }
