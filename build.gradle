@@ -17,6 +17,7 @@ java {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
 }
 
 dependencies {
@@ -38,6 +39,8 @@ dependencies {
 	implementation 'org.springframework.kafka:spring-kafka'
 	// Ably para WebSockets e Tempo Real
 	implementation 'io.ably:ably-java:1.2.33'
+	// Biblioteca do Spring AI (Usando o provedor Google Gemini)
+	implementation 'org.springframework.ai:spring-ai-starter-model-google-genai'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -53,6 +56,12 @@ spotless {
 	java {
 		googleJavaFormat() // Adota o rigoroso padrão de formatação de código do Google
 		removeUnusedImports() // Remove imports que não estão sendo usados
+	}
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.ai:spring-ai-bom:1.1.0"
 	}
 }
 
